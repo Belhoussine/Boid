@@ -6,7 +6,7 @@ The simulation speed can be adjusted using the slider at the bottom left of the 
 Link: [Boid](boid.belhoussine.com)
 ---------------
 
-<!-- ![Boid GIF](images/demo.gif) -->
+![Boid GIF](images/demo.gif)
 
 ## Implement a *Flappy Bird* clone
 - [x] **Bird class**:
