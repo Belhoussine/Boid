@@ -13,7 +13,7 @@ function Bird(id, brain) {
     this.velocity = 0;
     this.gravity = 0.5;
     this.lift = -15;
-    
+
     if (brain)
         this.brain = brain;
     else
@@ -60,6 +60,8 @@ function Bird(id, brain) {
         let decision = this.brain.think(environment);
         if (decision[0][0] > decision[1][0])
             this.jump();
+
+        return decision;
     }
 
     this.update = function () {
@@ -78,7 +80,7 @@ function Bird(id, brain) {
     this.draw = function () {
         textSize(20);
         text(this.id, this.x - this.size / 2, this.y - this.size / 2)
-        
+
         image(birdImg, this.x - this.size / 2, this.y - this.size / 2, this.size, this.size * 1.2);
     }
 
@@ -110,11 +112,31 @@ function Bird(id, brain) {
         this.alive = false;
     }
 
-    this.getClosestPipes = function() {
+    this.getClosestPipes = function () {
+        let placeHolder = {
+            top: 0,
+            bottom: 0,
+            left: 0,
+            right: 0
+        }
+
         let birdPos = this.x;
-        let pipe1 = pipes[0], pipe2 = pipes[1] || 0, pipe3 = pipes[2] || 0;
+        let pipe1 = pipes[0] || placeHolder, pipe2 = pipes[1] || placeHolder, pipe3 = pipes[2] || placeHolder;
         let dist1 = pipe1.right - birdPos;
-    
-        return dist1 >= 0 ? [pipe1, pipe2,1] : [pipe2, pipe3];
+
+        return dist1 >= 0 ? [pipe1, pipe2, 1] : [pipe2, pipe3];
+    }
+
+    this.save = function () {
+        var data = "text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(this.brain));
+
+        var a = createButton();
+        a.href = 'data:' + data;
+        a.download = 'data.json';
+        a.innerHTML = 'Save Best Bird';
+
+        var container = document.getElementById('container');
+        container.appendChild(a);
+
     }
 }

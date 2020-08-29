@@ -17,6 +17,7 @@ let pipeSpacing;
 let nBirds;
 let speed;
 let slider;
+let saveButton;
 
 //Evolution tracking
 let time;
@@ -46,6 +47,7 @@ function setup() {
     time = 0;
     nextGeneration(nBirds);
     slider = createSlider(2, 100, 10);
+    saveButton = createButton('Save Bird');
     speed = slider.value();
     frameRate(30);
 }
@@ -78,16 +80,15 @@ function updateBirds() {
             birdsAlive++;
             allDead = false;
             bestBird = bird;
-            if (pipes[0]) {
+            if (pipes[0])
                 bird.think();
-            }
         }
         bird.update();
     }
     // Restart game when all birds die
     if (allDead) {
         bestBirds.push(bestBird);
-        if (bestBirds.length > 10)
+        if (bestBirds.length > 3)
             bestBirds.shift();
 
         let bestBrain = copyBrain(bestBird.brain);
