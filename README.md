@@ -40,6 +40,8 @@ The simulation speed can be adjusted using the slider at the bottom left of the 
 - [x] Add activation functions
 - [x] Copy Neural Network function
 - [x] Predict / Think function
+- [ ] Save NN in JSON format
+- [ ] Load NN from JSON
 
 ## Implement a *Genetic Algorithm*
 - [x] Create a Generation of Birds
