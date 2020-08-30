@@ -4,7 +4,7 @@
 > **-This is a Neuroevolution [simulation](https://boid.belhoussine.com) that combines both Neural Networks and Genetic Algorithms to play the game *Flappy Bird***.  
 **-It takes about 20 generations for the boid to become good at the game, and about 50 to master it.**  
 **-The simulation speed can be adjusted using the slider at the bottom left of the page.**  
-**-Well performing boids can be saved and loaded into the game.**
+**-Well performing boids can be saved and loaded into the game.**  
 > Link: [Boid](https://boid.belhoussine.com)
 ---------------
 
