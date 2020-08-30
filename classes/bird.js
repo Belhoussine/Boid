@@ -1,5 +1,6 @@
 function Bird(id, brain) {
     this.id = id;
+    this.generation = generation;
     this.alive = true;
     this.timeAlive = 0;
     this.epsilon = 10;
@@ -22,7 +23,7 @@ function Bird(id, brain) {
     this.move = function () {
 
         this.velocity += this.gravity;
-        this.velocity *= 0.9;
+        this.velocity *= 0.95;
         this.y += this.velocity;
 
         if (this.hitsBottom()) {

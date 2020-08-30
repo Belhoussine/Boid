@@ -3,9 +3,9 @@ function Pipe() {
     this.spacing = 300;
     this.left = WIDTH;
     this.right = this.left + this.w;
-    this.top = random(HEIGHT / 9, HEIGHT / 1.5);
+    this.top = random(HEIGHT / 9, HEIGHT / 2);
     this.bottom = this.top + this.spacing;
-    this.velocity = 3;
+    this.velocity = 7;
 
     this.update = function () {
         this.updateValues();

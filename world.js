@@ -9,6 +9,7 @@ let birds;
 let pipes;
 let bestBird;
 let bestBirds = [];
+let b;
 
 //Parameters
 let WIDTH;
@@ -16,8 +17,14 @@ let HEIGHT;
 let pipeSpacing;
 let nBirds;
 let speed;
-let slider;
+let speedSlider;
+let nBirdsSlider
 let saveButton;
+let loadButton;
+let loadLabel;
+let saveLink;
+let speedLabel;
+let nBrirdsSliderLabel;
 
 //Evolution tracking
 let time;
@@ -34,26 +41,48 @@ function preload() {
 }
 
 function setup() {
-    WIDTH = windowWidth - 10;
-    HEIGHT = windowHeight - 30;
+    WIDTH = windowWidth - 0;
+    HEIGHT = windowHeight - 130;
     createCanvas(WIDTH, HEIGHT);
+    speedLabel = createP('<b>Learning Speed</b>')
+    nBrirdsSliderLabel = createP('<b>Birds per Generation</p>')
+    loadLabel = createP('<b>Load Bird (JSON):</b>')
+    speedSlider = createSlider(2, 100, 2);
+    nBirdsSlider = createSlider(1, 300, 150, 1);
+    saveButton = createButton('Save Best Bird');
+    loadButton = createInput('Load Bird');
+    loadButton.elt.type = 'file';
+    loadButton.elt.id = 'json-file';
+    loadButton.elt.accept = 'application/JSON';
+    loadButton.elt.onchange = loadBird;
+    saveLink = createA('', 'Save Best Bird');
+    saveLink.elt.hidden = true;
+    saveButton.elt.onclick = saveBestBird;
+
+    speedLabel.position(20, HEIGHT + 10);
+    nBrirdsSliderLabel.position(195, HEIGHT + 10);
+    loadLabel.position(20, HEIGHT + 58);
+    speedSlider.position(0, HEIGHT);
+    nBirdsSlider.position(200, HEIGHT);
+    saveButton.position(430, HEIGHT + 10);
+    loadButton.position(195, HEIGHT + 70);
+
+    birds = []
+    pipes = []
     generation = 0;
     score = 0;
     bestScore = 0;
-    birds = []
-    pipes = []
-    nBirds = 200;
-    pipeSpacing = 150;
+    nBirds = nBirdsSlider.value();
+    pipeSpacing = 75;
     time = 0;
-    nextGeneration(nBirds);
-    slider = createSlider(2, 100, 10);
-    saveButton = createButton('Save Bird');
-    speed = slider.value();
+    nextGeneration();
+    speed = speedSlider.value();
     frameRate(30);
 }
 
 function draw() {
-    speed = slider.value();
+    nBirds = nBirdsSlider.value();
+    speed = speedSlider.value();
     for (let i = 0; i < speed; i++) {
         generatePipes();
         updatePipes();
@@ -72,18 +101,17 @@ function draw() {
 //Random Jumping 
 function updateBirds() {
     let allDead = true;
-    let closestPipes;
     birdsAlive = 0;
     // Updating birds that are alive
     for (let bird of birds) {
         if (bird.alive) {
-            birdsAlive++;
             allDead = false;
+            birdsAlive++;
+            bird.update();
             bestBird = bird;
             if (pipes[0])
                 bird.think();
         }
-        bird.update();
     }
     // Restart game when all birds die
     if (allDead) {
@@ -93,7 +121,7 @@ function updateBirds() {
 
         let bestBrain = copyBrain(bestBird.brain);
         restart();
-        nextGeneration(nBirds, bestBrain);
+        nextGeneration(bestBrain);
         return;
     }
 }
@@ -136,11 +164,11 @@ function showPipes() {
 
 
 function getScore() {
-    if (pipes[0] && abs(pipes[0].right - round(WIDTH / 8)) <= 1) {
-        bestScore = max(score, bestScore);
+    if (pipes[0] && pipes[0].right - round(WIDTH / 8) <= 7 && pipes[0].right - round(WIDTH / 8) >= 0) {
         score++;
-        return;
+        bestScore = max(score, bestScore);
     }
+    return score;
 }
 
 function showScoreBoard() {
@@ -160,6 +188,45 @@ function restart() {
     time = 0;
 }
 
+function reset() {
+    restart();
+    bestScore = 0;
+    generation = 0;
+}
+
+function saveBestBird() {
+    let currentBest = bestBirds[bestBirds.length - 1];
+    let best = currentBest || { timeAlive: 0 };
+
+    for (let bird of birds) {
+        if (best.timeAlive < bird.timeAlive) {
+            best = bird;
+        }
+    }
+    download(JSON.stringify(best), "BestBird_Gen" + best.generation + "_Id" + best.id + ".json", "text/plain")
+}
+
+async function loadBird() {
+    noLoop();
+    let parentFile = await loadButton.elt.files[0].text();
+    if (isJSON(parentFile)) {
+        let parent = JSON.parse(parentFile);
+        let parentBrain = copyBrain(parent.brain)
+        reset();
+        nextGeneration(parentBrain);
+    }
+    loop();
+}
+
+function isJSON(str) {
+    try {
+        JSON.parse(str);
+    } catch (e) {
+        return false;
+    }
+    return true;
+}
+
 function backgroundImg() {
     background(0);
     imageMode(CORNER);
@@ -168,9 +235,13 @@ function backgroundImg() {
 
 function keyPressed() {
     if (key === 'r') {
-        restart();
-        nextGeneration(nBirds);
+        reset();
+        nextGeneration();
         loop();
+    }
+
+    if (key === 's') {
+        saveBestBird();
     }
 
     if (key === ' ') {
@@ -181,4 +252,11 @@ function keyPressed() {
             loop();
         }
     }
+}
+
+function download(content, fileName, contentType) {
+    const file = new Blob([content], { type: contentType });
+    saveLink.elt.href = URL.createObjectURL(file);
+    saveLink.elt.download = fileName;
+    saveLink.elt.click();
 }
